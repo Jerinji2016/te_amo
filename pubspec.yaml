@@ -28,6 +28,27 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
+  # FlutterFire
+  firebase_auth: ^3.1.0
+  cloud_firestore: ^2.5.1
+  firebase_messaging: ^10.0.6
+  firebase_core: ^1.6.0
+  firebase_storage: ^10.0.3
+
+  # Sqlite
+  sqflite: ^2.0.0+4
+
+  # Image helpers
+  image_picker: ^0.8.4
+  image_crop: ^0.4.0
+  cached_network_image: ^3.1.0
+
+  toast: ^0.1.5
+  shared_preferences: ^2.0.7
+  path_provider: ^2.0.3
+  provider: ^6.0.0
+  intl: ^0.17.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
