@@ -1,14 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:te_amo/ui/login/log_in.dart';
 import 'package:te_amo/ui/splash_page.dart';
 
 class Routes {
-  static const String SPLASH_PAGE = "/";
+  static const String SPLASH_PAGE = "/", LOG_IN = "/login";
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case SPLASH_PAGE:
         return MaterialPageRoute(builder: (_) => SplashPage());
+      case LOG_IN:
+        return MaterialPageRoute(builder: (_) => LogIn());
+        // return PageRouteBuilder(
+        //   maintainState: true,
+        //   pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) => LogIn(),
+        // );
       default:
         return MaterialPageRoute(builder: (_) => PageNotFound());
     }
@@ -56,3 +63,6 @@ class PageNotFound extends StatelessWidget {
     );
   }
 }
+
+//  For different page route transition animations check out
+//  https://medium.com/flutter-community/everything-you-need-to-know-about-flutter-page-route-transition-9ef5c1b32823

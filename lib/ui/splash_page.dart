@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:te_amo/helpers/pref_manager.dart';
+import 'package:te_amo/helpers/routes.dart';
 import 'package:te_amo/widgets/logo.dart';
 
 class SplashPage extends StatefulWidget {
@@ -11,13 +12,25 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   @override
-  Widget build(BuildContext context) {
-    print("built splash page ${Theme.of(context).brightness}");
+  void initState() {
+    super.initState();
 
-    return Scaffold(
-      body: Center(
-        child: Logo(),
-      ),
-    );
+    _initialize();
   }
+
+  void _initialize() async {
+    await PrefManager.initialize();
+    await Future.delayed(Duration(seconds: 2));
+    Navigator.pushNamed(context, Routes.LOG_IN);
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Center(
+          child: Hero(
+            tag: "splash-logo",
+            child: Logo(logoSize: 150),
+          ),
+        ),
+      );
 }
