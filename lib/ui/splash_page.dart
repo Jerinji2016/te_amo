@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:te_amo/widgets/logo.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -10,29 +12,12 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
+    print("built splash page ${Theme.of(context).brightness}");
+
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image(
-              width: 150,
-              height: 150,
-              image: AssetImage('assets/images/te_amo_logo.png'),
-            ),
-            Text(
-              "Te Amo",
-              style: TextStyle(
-                fontSize: 30,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+        child: Logo(),
       ),
     );
   }
 }
-
-
