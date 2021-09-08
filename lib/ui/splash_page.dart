@@ -21,7 +21,7 @@ class _SplashPageState extends State<SplashPage> {
   void _initialize() async {
     await PrefManager.initialize();
     await Future.delayed(Duration(seconds: 2));
-    Navigator.pushNamed(context, Routes.LOG_IN);
+    Navigator.pushReplacementNamed(context, Routes.LOG_IN);
   }
 
   @override

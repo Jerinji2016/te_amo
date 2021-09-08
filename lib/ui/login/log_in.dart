@@ -1,8 +1,15 @@
+
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:te_amo/helpers/animations.dart';
+import 'package:te_amo/ui/login/user_details_view.dart';
+import 'package:te_amo/widgets/country_code/country_adapter.dart';
 import 'package:te_amo/widgets/logo.dart';
+
+import 'log_in_util.dart';
+import 'phone_number_view.dart';
+import 'phone_verification_view.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({Key? key}) : super(key: key);
@@ -13,18 +20,40 @@ class LogIn extends StatefulWidget {
 
 class _LogInState extends State<LogIn> with TickerProviderStateMixin {
   late AnimationController _logoAnimationController;
+  late AnimationController _contentExitAnimationController;
+  late AnimationController _contentIntroAnimationController;
 
   TextEditingController _phoneNoController = new TextEditingController();
+  TextEditingController _phoneCodeController = new TextEditingController();
+  TextEditingController _usernameController = new TextEditingController();
 
-  int contentViewNo = 0;
+  static const int _PHONE_NO_VIEW = 0, _VERIFICATION_CODE_VIEW = 1, _USER_DETAILS_VIEW = 2;
+
+  int contentViewNo = _PHONE_NO_VIEW;
+  final LogInUtil logInUtil = LogInUtil();
+
+  late CountryAdapter _countryAdapter;
 
   @override
   void initState() {
     super.initState();
 
+    _countryAdapter = CountryAdapter(context);
+
     _logoAnimationController = new AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 2000),
+    );
+
+    _contentIntroAnimationController = new AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1500),
+    );
+    _contentIntroAnimationController.animateTo(1.0, duration: Duration(seconds: 0));
+
+    _contentExitAnimationController = new AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1000),
     );
 
     _logoAnimationController.forward(from: 0.0);
@@ -41,23 +70,65 @@ class _LogInState extends State<LogIn> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedBuilder(
-        animation: _logoAnimationController,
-        builder: (_, __) => Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return AnimatedBuilder(
+      animation: _logoAnimationController,
+      builder: (_, __) => Scaffold(
+        floatingActionButton: Transform.translate(
+          offset: Offset(
+            0,
+            tweenValue(
+              20,
+              0,
+              _logoAnimationController,
+              curve: Interval(
+                0.6,
+                1.0,
+                curve: Curves.ease,
+              ),
+            ).value,
+          ),
+          child: Opacity(
+            opacity: tweenValue(
+              0.0,
+              1.0,
+              _logoAnimationController,
+              curve: Interval(
+                0.6,
+                1,
+                curve: Curves.ease,
+              ),
+            ).value,
+            child: Material(
+              color: Theme.of(context).accentColor,
+              borderRadius: BorderRadius.circular(50.0),
+              child: InkWell(
+                onTap: _onNextTapped,
+                borderRadius: BorderRadius.circular(50.0),
+                child: Container(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Icon(
+                    Icons.arrow_forward_outlined,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        body: Column(
           children: [
             Expanded(
-              flex: 4,
               child: Center(
                 child: Hero(
                   tag: "splash-logo",
-                  child: Logo(logoSize: 100, appLabelSize: 24, key: UniqueKey(),),
+                  child: Logo(
+                    logoSize: 100,
+                    appLabelSize: 24,
+                    key: UniqueKey(),
+                  ),
                 ),
               ),
             ),
             Expanded(
-              flex: 2,
               child: Transform.translate(
                 offset: Offset(
                     0,
@@ -74,57 +145,8 @@ class _LogInState extends State<LogIn> with TickerProviderStateMixin {
                     _logoAnimationController,
                     curve: Interval(0.4, 0.8, curve: Curves.ease),
                   ).value,
-                  child: GetPhoneNumberView(_phoneNoController),
+                  child: _contentView(),
                 ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 30.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Transform.translate(
-                    offset: Offset(
-                      0,
-                      tweenValue(
-                        20,
-                        0,
-                        _logoAnimationController,
-                        curve: Interval(
-                          0.6,
-                          1.0,
-                          curve: Curves.ease,
-                        ),
-                      ).value,
-                    ),
-                    child: Opacity(
-                      opacity: tweenValue(
-                        0.0,
-                        1.0,
-                        _logoAnimationController,
-                        curve: Interval(
-                          0.6,
-                          1,
-                          curve: Curves.ease,
-                        ),
-                      ).value,
-                      child: Material(
-                        color: Theme.of(context).accentColor,
-                        borderRadius: BorderRadius.circular(50.0),
-                        child: InkWell(
-                          onTap: _onNextTapped,
-                          borderRadius: BorderRadius.circular(50.0),
-                          child: Container(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Icon(
-                              Icons.arrow_forward_outlined,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
@@ -133,99 +155,65 @@ class _LogInState extends State<LogIn> with TickerProviderStateMixin {
     );
   }
 
-  void _onNextTapped() {
+  Widget _contentView() => AnimatedBuilder(
+        animation: _contentIntroAnimationController,
+        builder: (context, child) => Opacity(
+          opacity: tweenValue(0, 1, _contentIntroAnimationController, curve: Curves.fastLinearToSlowEaseIn).value,
+          child: Transform.translate(
+            offset: Offset(tweenValue(50, 0, _contentIntroAnimationController, curve: Curves.fastLinearToSlowEaseIn).value, 0),
+            child: child!,
+          ),
+        ),
+        child: AnimatedBuilder(
+          animation: _contentExitAnimationController,
+          builder: (context, child) => Opacity(
+            opacity: tweenValue(1, 0, _contentExitAnimationController, curve: Curves.fastLinearToSlowEaseIn).value,
+            child: Transform.translate(
+              offset: Offset(0, tweenValue(0, 30, _contentExitAnimationController, curve: Curves.fastLinearToSlowEaseIn).value),
+              child: Transform.scale(
+                scale: tweenValue(1, 0, _contentExitAnimationController, curve: Curves.fastLinearToSlowEaseIn).value,
+                child: child!,
+              ),
+            ),
+          ),
+          child: Builder(
+            builder: (_) {
+              switch (contentViewNo) {
+                case 1:
+                  return PhoneVerificationView(_phoneCodeController);
+                case 2:
+                  return UserDetailsView(_usernameController);
+                default:
+                  return PhoneNumberView(_phoneNoController, _countryAdapter);
+              }
+            },
+          ),
+        ),
+      );
+
+  Future<void> _changeView(int view) async {
+    await _contentExitAnimationController.forward(from: 0.0);
+    setState((){
+      contentViewNo = view;
+      _contentExitAnimationController.reset();
+    });
+    await _contentIntroAnimationController.forward(from: 0.0);
+  }
+
+  void _onNextTapped() async {
     switch (contentViewNo) {
-      case 0:
-        //  Generate otp for phone no verification
+      case _PHONE_NO_VIEW:
+        await _changeView(_VERIFICATION_CODE_VIEW);
         break;
-      case 1:
+      case _VERIFICATION_CODE_VIEW:
+        await _changeView(_USER_DETAILS_VIEW);
         //  Check verification code from otp
         break;
-      case 2:
+      case _USER_DETAILS_VIEW:
         //  If new user add name and Dp
         //  else take user to chat page
         //  TODO: Add 2 step password lock
         break;
     }
-  }
-}
-
-class GetPhoneNumberView extends StatelessWidget {
-  final TextEditingController _phoneNoController;
-
-  const GetPhoneNumberView(this._phoneNoController, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 50.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  width: 2.5,
-                  color: Colors.blueGrey,
-                ),
-              ),
-            ),
-            padding: EdgeInsets.only(bottom: 5.0),
-            child: Text(
-              "Your Phone",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            child: Row(
-              children: <Widget>[
-                Text(
-                  "+91(IN)",
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _phoneNoController,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                      hintText: "Enter Phone Number",
-                      enabledBorder: UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: Colors.green[700]!,
-                          width: 2,
-                        ),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: Colors.blue[500]!,
-                          width: 2,
-                        ),
-                      ),
-                      hintStyle: TextStyle(
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(color: Colors.white),
-                    onChanged: (text) {
-                      if (text.length == 10) FocusScope.of(context).requestFocus(FocusNode());
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
