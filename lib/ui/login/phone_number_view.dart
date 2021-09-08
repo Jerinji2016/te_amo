@@ -60,6 +60,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                   width: 50.0,
                   child: TextField(
                     style: TextStyle(color: Colors.blueGrey),
+                    keyboardType: TextInputType.number,
                     onChanged: (code) => setState(
                       () => widget._countryAdapter.country = widget._countryAdapter.values.firstWhere(
                         (element) => element.dialCode == code.trim(),
@@ -96,9 +97,6 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                     ),
                     keyboardType: TextInputType.number,
                     style: TextStyle(color: Colors.white),
-                    onChanged: (text) {
-                      if (text.length == 10) FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
               ],

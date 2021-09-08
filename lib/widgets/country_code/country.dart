@@ -5,5 +5,5 @@ class Country {
 
   Country(this.name, this.code, this.dialCode);
 
-  static Country none(String num) => Country("Invalid country code", "", num);
+  static Country none(String num) => Country("Invalid country code", "null", num);
 }

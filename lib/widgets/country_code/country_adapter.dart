@@ -11,7 +11,7 @@ class CountryAdapter {
   CountryAdapter(BuildContext context) {
     //  load all countries data
     values = List.from(
-      codes.map((map) => Country(map["name"]!, map["code"]!, map["dial_code"] ?? "null")).toList(),
+      codes.map((map) => Country(map["name"]!, map["code"]!, map["dial_code"]?.replaceAll(" ", "") ?? "null")).toList(),
     );
 
     country = values.firstWhere((element) => element.dialCode == "+91");

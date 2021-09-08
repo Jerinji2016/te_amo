@@ -5,6 +5,8 @@ import 'package:te_amo/helpers/routes.dart';
 Color accentColor = Colors.blue[700]!;
 Color errorColor = Colors.red[700]!;
 
+bool theme = true;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
